@@ -488,6 +488,10 @@ window.wp = window.wp || {};
 			return view;
 		},
 
+		baseUrl: function( url ) {
+			return themes.data.settings.baseUrl + url;
+		},
+
 		// Renders the overlay with the ThemeDetails view
 		// Uses the current model data
 		expand: function( id ) {
@@ -497,7 +501,7 @@ window.wp = window.wp || {};
 			this.model = self.collection.get( id );
 
 			// Trigger a route update for the current model
-			themes.router.navigate( 'theme/' + this.model.id );
+			themes.router.navigate( this.baseUrl( '?theme=' + this.model.id ) );
 
 			// Sets this.view to 'detail'
 			this.setView( 'detail' );
@@ -568,7 +572,7 @@ window.wp = window.wp || {};
 				});
 
 				// Trigger a route update for the current model
-				themes.router.navigate( 'theme/' + nextModel.id );
+				themes.router.navigate( this.baseUrl( '?theme=' + nextModel.id ) );
 
 				// Render and fill this.overlay with the new html
 				this.nextTheme.render();
@@ -604,7 +608,7 @@ window.wp = window.wp || {};
 				});
 
 				// Trigger a route update for the current model
-				themes.router.navigate( 'theme/' + previousModel.id );
+				themes.router.navigate( '?theme=' + previousModel.id );
 
 				// Render and fill this.overlay with the new html
 				this.previousTheme.render();
@@ -648,9 +652,11 @@ window.wp = window.wp || {};
 	// Listens to [theme] and [search] params
 	themes.routes = Backbone.Router.extend({
 
-		routes: {
-			'search/:query': 'search',
-			'theme/:slug': 'theme',
+		initialize: function( baseUrl ) {
+			this.routes = _.object([
+				[ baseUrl + '?search=:query', 'search' ],
+				[ baseUrl + '?theme=:slug', 'theme' ]
+			]);
 		},
 
 		// Set the search input value based on url
@@ -687,8 +693,7 @@ window.wp = window.wp || {};
 				// Calls the routes functionality
 				this.routes();
 				Backbone.history.start({
-					pushState: true,
-					root: themes.data.settings.root
+					pushState: true
 				});
 			}
 		},
@@ -697,7 +702,7 @@ window.wp = window.wp || {};
 			var self = this;
 			// Bind to our global thx object
 			// so that the object is available to sub-views
-			themes.router = new themes.routes;
+			themes.router = new themes.routes( themes.data.settings.baseUrl );
 
 			// Handles theme details route event
 			themes.router.on( 'route:theme', function( slug ) {

@@ -268,7 +268,8 @@ class THX_38 {
 				'root'          => apply_filters( 'themes_admin_router_root', '/wp-admin/themes.php' ),
 				'container'     => apply_filters( 'themes_admin_dom_container', '#appearance' ),
 				'extraRoutes'   => apply_filters( 'themes_admin_dom_container', '' ),
-			),
+				'baseUrl'       => parse_url( admin_url( 'themes.php' ), PHP_URL_PATH ),
+		),
 			'i18n' => apply_filters( 'themes_admin_i18n', array(
 				'active'          => __( 'Current Theme' ),
 				'add_new'         => __( 'Add New Theme' ),
