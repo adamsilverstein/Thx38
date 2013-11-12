@@ -681,11 +681,11 @@ window.wp = window.wp || {};
 			// Render results
 			this.view.render();
 
-			// Calls the routes functionality
-			this.routes();
 
 			// Set ups history with pushState and our root
 			if ( window.history && window.history.pushState ) {
+				// Calls the routes functionality
+				this.routes();
 				Backbone.history.start({
 					pushState: true,
 					root: themes.data.settings.root
