@@ -608,7 +608,7 @@ window.wp = window.wp || {};
 				});
 
 				// Trigger a route update for the current model
-				themes.router.navigate( '?theme=' + previousModel.id );
+				themes.router.navigate( this.baseUrl ( '?theme=' + previousModel.id ) );
 
 				// Render and fill this.overlay with the new html
 				this.previousTheme.render();
@@ -652,21 +652,34 @@ window.wp = window.wp || {};
 	// Listens to [theme] and [search] params
 	themes.routes = Backbone.Router.extend({
 
+		routes: {
+			'wp-admin/themes.php*': 'test',
+			'wp-admin/themes.php/search/:query': 'search',
+			'wp-admin/themes.php/theme=:slug': 'theme',
+		},
+
+		test: function( passed ){
+			console.log( passed );
+		},
+
 		initialize: function( baseUrl ) {
-			this.routes = _.object([
-				[ baseUrl + '?search=:query', 'search' ],
-				[ baseUrl + '?theme=:slug', 'theme' ]
+			/*this.routes = _.object([
+				[ baseUrl + '/search=:query', 'search' ],
+				[ baseUrl + '/theme=:slug', 'theme' ]
 			]);
+*/
+			console.log(this.routes);
 		},
 
 		// Set the search input value based on url
 		search: function( query ) {
+			console.log( 'search' );
 			$( '#theme-search' ).val( query );
 		}
 	});
 
 	// Make routes easily extendable
-	_.extend( themes.routes, themes.data.settings.extraRoutes );
+	//_.extend( themes.routes, themes.data.settings.extraRoutes );
 
 	// Execute and setup the application
 	themes.Run = {
