@@ -497,7 +497,7 @@ window.wp = window.wp || {};
 			this.model = self.collection.get( id );
 
 			// Trigger a route update for the current model
-			themes.router.navigate( 'theme/' + this.model.id );
+			themes.router.navigate( themes.data.settings.root + '?theme=' + this.model.id );
 
 			// Sets this.view to 'detail'
 			this.setView( 'detail' );
@@ -568,7 +568,7 @@ window.wp = window.wp || {};
 				});
 
 				// Trigger a route update for the current model
-				themes.router.navigate( 'theme/' + nextModel.id );
+				themes.router.navigate( themes.data.settings.root + '?theme=' + nextModel.id );
 
 				// Render and fill this.overlay with the new html
 				this.nextTheme.render();
@@ -604,7 +604,7 @@ window.wp = window.wp || {};
 				});
 
 				// Trigger a route update for the current model
-				themes.router.navigate( 'theme/' + previousModel.id );
+				themes.router.navigate( themes.data.settings.root + '?theme=' + previousModel.id );
 
 				// Render and fill this.overlay with the new html
 				this.previousTheme.render();
@@ -650,7 +650,18 @@ window.wp = window.wp || {};
 
 		routes: {
 			'search/:query': 'search',
-			'theme/:slug': 'theme',
+			'*params': 'theme',
+		},
+
+		getParam: function( param ) {
+			if ( param ) {
+				var query = new RegExp( '[?|&]' + param + '(=)?(.*?)(&|#|$)' ),
+					search = document.URL.match( query );
+				if ( search ){
+					return unescape( search[2] );
+				}
+			}
+			return '';
 		},
 
 		// Set the search input value based on url
@@ -681,14 +692,12 @@ window.wp = window.wp || {};
 			// Render results
 			this.view.render();
 
-
 			// Set ups history with pushState and our root
 			if ( window.history && window.history.pushState ) {
 				// Calls the routes functionality
 				this.routes();
 				Backbone.history.start({
-					pushState: true,
-					root: themes.data.settings.root
+					pushState: true
 				});
 			}
 		},
@@ -701,7 +710,13 @@ window.wp = window.wp || {};
 
 			// Handles theme details route event
 			themes.router.on( 'route:theme', function( slug ) {
-				self.view.view.expand( slug );
+				if ( '' === themes.router.getParam( 'theme' ) ) {
+					if ( null !== slug ) {
+						self.view.view.expand( slug );
+					}
+				} else {
+					self.view.view.expand( themes.router.getParam( 'theme' ) )
+				}
 			});
 
 			// Handles search route event
